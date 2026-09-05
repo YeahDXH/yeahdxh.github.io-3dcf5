@@ -36,7 +36,7 @@ exports.handler = async (event) => {
     let secretPage = (process.env.SECRET_PAGE || '').trim();
 
     // If env not set, default to the original internal secret page
-    if (!secretPage) secretPage = '/secret.html';
+    if (!secretPage) secretPage = '/043a718774c572bd8a25adbeb1bfcd5c0256ae11cecf9f9c3f925d0e52beaf893f79bb7b435b05321651daefd374cdc681dc06faa65e374e38337b88ca046dea2e7d2c03a9507ae265ecf5b5356885a53393a2029d241394997265a1a25aefc6454349e422f05297191ead13e21d3db520e5abef52055e4964b82fb213f593a13f79bb7b435b05321651daefd374cdc681dc06faa65e374e38337b88ca046deae3b98a4da31a127d4bde6e43033f66ba274cab0eb7eb1c70ec41402bf6273dd8.html.html';
 
     // If it's an absolute URL, redirect as-is
     if (/^https?:\/\//i.test(secretPage)) {
