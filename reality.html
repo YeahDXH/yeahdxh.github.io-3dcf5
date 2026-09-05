@@ -1,78 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>reality</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        .passcode-box {
-            margin-top: 20px;
-        }
-        .passcode-box label {
-            font-size: 18px;
-            display: block;
-            margin-bottom: 8px;
-        }
-        .passcode-box input[type="text"] {
-            width: 300px;
-            padding: 4px;
-            border: 1px solid #000;
-            font-size: 16px;
-            outline: none;
-            display: block;
-            margin-bottom: 10px;
-        }
-        .passcode-box button {
-            background-color: #00a2ff;
-            color: #ffffff;
-            border: none;
-            padding: 4px 12px;
-            font-size: 16px;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>reality</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .passcode-box { margin-top: 20px; }
+    .passcode-box label { font-size: 18px; display: block; margin-bottom: 8px; }
+    .passcode-box input[type="text"] { width: 300px; padding: 4px; border: 1px solid #000; font-size: 16px; outline: none; display: block; margin-bottom: 10px; }
+    .passcode-box button { background-color: #00a2ff; color: #ffffff; border: none; padding: 4px 12px; font-size: 16px; cursor: pointer; text-decoration: underline; }
+  </style>
 </head>
 <body>
-    <div class="header-star">
-        <span class="line-1">DXH's</span>
-        <span class="line-2">Sample Website</span>
-    </div>
+  <div class="header-star">
+    <span class="line-1">DXH's</span>
+    <span class="line-2">Sample Website</span>
+  </div>
 
-    <h1 class="page-title" style="color: red;">reality</h1>
+  <h1 class="page-title" style="color: red;">reality</h1>
 
-    <div class="passcode-box">
-        <label for="passcode">whats the passcode?</label>
-        <input type="text" id="passcode" autocomplete="off">
-        <button type="button" onclick="checkPasscode()">submit</button>
-    </div>
+  <div class="passcode-box">
+    <label for="passcode">whats the passcode?</label>
+    <input type="text" id="passcode" autocomplete="off">
+    <button type="button" id="submitBtn">submit</button>
+  </div>
 
-    <div class="back-link">
-        <a href="archives.html">&lt;- back</a>
-    </div>
+  <div class="back-link">
+    <a href="archives.html">&lt;- back</a>
+  </div>
 
-    <script>
-        // Submit the passcode to the serverless function via a POST form opened in a new tab.
-        // The function performs the verification and returns a page showing the clue — it will not redirect to the final file.
-        function checkPasscode() {
-            const pass = document.getElementById('passcode').value || '';
+  <script>
+    // Use an event listener instead of inline onclick to avoid issues if scripts fail to parse earlier.
+    (function(){
+      function submitHandler() {
+        try {
+          var pass = document.getElementById('passcode').value || '';
+          var form = document.createElement('form');
+          form.method = 'POST';
+          form.action = '/.netlify/functions/check-pass';
+          form.target = '_blank';
 
-            // build a small form and submit it to the function, opening result in a new tab
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/.netlify/functions/check-pass';
-            form.target = '_blank';
+          var input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'pass';
+          input.value = pass;
+          form.appendChild(input);
 
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'pass';
-            input.value = pass;
-            form.appendChild(input);
-
-            document.body.appendChild(form);
-            form.submit();
-            form.remove();
+          document.body.appendChild(form);
+          form.submit();
+          form.remove();
+        } catch (e) {
+          // If something goes wrong, show a generic message so we don't leak secrets
+          alert('There was an error submitting the passcode. Check the console for details.');
+          console.error(e);
         }
-    </script>
+      }
+
+      // Attach listener when DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          var btn = document.getElementById('submitBtn');
+          if (btn) btn.addEventListener('click', submitHandler);
+        });
+      } else {
+        var btn = document.getElementById('submitBtn');
+        if (btn) btn.addEventListener('click', submitHandler);
+      }
+    })();
+  </script>
 </body>
 </html>
