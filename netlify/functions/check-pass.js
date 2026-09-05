@@ -32,17 +32,31 @@ exports.handler = async (event) => {
       return { statusCode: 401, headers: { 'Content-Type': 'text/html' }, body: '<h1>Incorrect passcode</h1>' };
     }
 
-    // If SECRET_PAGE env var is set, redirect there. Otherwise default to the internal secret page.
-    const secretPage = (process.env.SECRET_PAGE || '/secret.html').trim();
-    // If SECRET_PAGE looks like a full URL (http(s)://) redirect there; otherwise treat as relative internal path
+    // Read SECRET_PAGE from env and normalize it.
+    let secretPage = (process.env.SECRET_PAGE || '').trim();
+
+    // If env not set, default to the original internal secret page
+    if (!secretPage) secretPage = '/secret.html';
+
+    // If it's an absolute URL, redirect as-is
     if (/^https?:\/\//i.test(secretPage)) {
       return { statusCode: 302, headers: { Location: secretPage }, body: '' };
     }
 
-    // Internal redirect to the secret page on the same site
+    // Otherwise treat as an internal path. Ensure it starts with '/'
+    if (!secretPage.startsWith('/')) {
+      // If the value looks like a bare filename without an extension, append .html
+      if (!secretPage.includes('.')) {
+        secretPage = '/' + secretPage + '.html';
+      } else {
+        secretPage = '/' + secretPage;
+      }
+    }
+
     return { statusCode: 302, headers: { Location: secretPage }, body: '' };
 
   } catch (err) {
+    console.error('check-pass error', err);
     return { statusCode: 500, headers: { 'Content-Type': 'text/plain' }, body: 'Server error' };
   }
 };
