@@ -3,12 +3,10 @@ const querystring = require('querystring');
 
 exports.handler = async (event) => {
   try {
-    // Only allow POST
     if (event.httpMethod !== 'POST') {
       return { statusCode: 405, headers: { 'Content-Type': 'text/plain' }, body: 'Method Not Allowed' };
     }
 
-    // Parse urlencoded or JSON body
     const contentType = (event.headers['content-type'] || event.headers['Content-Type'] || '').toLowerCase();
     let pass;
     if (contentType.includes('application/json')) {
@@ -23,7 +21,6 @@ exports.handler = async (event) => {
       return { statusCode: 401, headers: { 'Content-Type': 'text/html' }, body: '<h1>Incorrect passcode</h1>' };
     }
 
-    // Compute SHA-256 and compare with stored PASS_HASH
     const hash = crypto.createHash('sha256').update(pass, 'utf8').digest('hex');
     const stored = (process.env.PASS_HASH || '').trim();
     if (!stored || stored.length !== hash.length) {
@@ -35,13 +32,16 @@ exports.handler = async (event) => {
       return { statusCode: 401, headers: { 'Content-Type': 'text/html' }, body: '<h1>Incorrect passcode</h1>' };
     }
 
-    // On success, redirect to SECRET_URL (must be a full absolute URL set in Netlify env)
-    const secretUrl = (process.env.SECRET_URL || '').trim();
-    if (!secretUrl) {
-      return { statusCode: 500, headers: { 'Content-Type': 'text/plain' }, body: 'Secret URL not configured' };
+    // If SECRET_PAGE env var is set, redirect there. Otherwise default to the internal secret page.
+    const secretPage = (process.env.SECRET_PAGE || '/secret.html').trim();
+    // If SECRET_PAGE looks like a full URL (http(s)://) redirect there; otherwise treat as relative internal path
+    if (/^https?:\/\//i.test(secretPage)) {
+      return { statusCode: 302, headers: { Location: secretPage }, body: '' };
     }
 
-    return { statusCode: 302, headers: { Location: secretUrl }, body: '' };
+    // Internal redirect to the secret page on the same site
+    return { statusCode: 302, headers: { Location: secretPage }, body: '' };
+
   } catch (err) {
     return { statusCode: 500, headers: { 'Content-Type': 'text/plain' }, body: 'Server error' };
   }

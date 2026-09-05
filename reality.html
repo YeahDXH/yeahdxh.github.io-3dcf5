@@ -1,35 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <title>reality</title>
-  <link rel="stylesheet" href="style.css">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="style.css">
   <style>
-    .passcode-box { margin-top: 20px; }
-    .passcode-box label { font-size: 18px; display: block; margin-bottom: 8px; }
-    .passcode-box input[type="password"], .passcode-box input[type="text"] { width: 300px; padding: 4px; border: 1px solid #000; font-size: 16px; outline: none; display: block; margin-bottom: 10px; }
-    .passcode-box button { background-color: #00a2ff; color: #ffffff; border: none; padding: 4px 12px; font-size: 16px; cursor: pointer; text-decoration: underline; }
+    body { font-family: Arial, Helvetica, sans-serif; padding: 24px; }
+    .header-star { position: absolute; right: 24px; top: 16px; }
+    .page-title { color: #000; font-size: 36px; margin-top: 8px; }
+    .passcode-box { margin-top: 24px; }
+    .passcode-box input[type="password"] { width: 420px; padding: 8px; border: 2px solid #234; font-size: 16px; }
+    .btn { display:inline-block; margin-top:10px; background:#00a2ff; color:#fff; padding:6px 12px; text-decoration:none; border:none; cursor:pointer }
+    .help-link { display:block; margin-top:14px; color:#00a2ff }
+    .back-link { margin-top:32px }
   </style>
 </head>
 <body>
   <div class="header-star">
-    <span class="line-1">DXH's</span>
-    <span class="line-2">Sample Website</span>
+    <svg width="160" height="100" viewBox="0 0 200 130">
+      <polygon points="100,5 130,40 170,50 140,80 150,120 100,100 50,120 60,80 30,50 70,40" fill="#0f5f6f" />
+      <text x="100" y="75" fill="#fff" font-family="Georgia, serif" font-size="16" text-anchor="middle">DXH's</text>
+      <text x="100" y="95" fill="#fff" font-family="Georgia, serif" font-size="12" text-anchor="middle">Sample Website</text>
+    </svg>
   </div>
 
-  <h1 class="page-title" style="color: red;">reality</h1>
+  <h1 class="page-title">reality</h1>
 
   <div class="passcode-box">
     <form method="post" action="/.netlify/functions/check-pass">
-      <label for="passcode">whats the passcode?</label>
-      <input type="password" id="passcode" name="pass" autocomplete="off">
-      <button type="submit">submit</button>
+      <label for="passcode">whats the passcode?</label><br>
+      <input type="password" id="passcode" name="pass" autocomplete="off" aria-label="passcode">
+      <div>
+        <button class="btn" type="submit">submit</button>
+      </div>
     </form>
+
+    <a class="help-link" href="/help.html">need help? (clue 7 only)</a>
   </div>
 
   <div class="back-link">
-    <a href="archives.html">&lt;- back</a>
+    <a href="/archives.html">&lt;- back</a>
   </div>
 </body>
 </html>
