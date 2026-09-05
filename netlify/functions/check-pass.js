@@ -21,8 +21,17 @@ exports.handler = async (event) => {
       return { statusCode: 401, headers: { 'Content-Type': 'text/html' }, body: '<h1>Incorrect passcode</h1>' };
     }
 
+    // SPECIAL-CASE: literal passphrase redirect to short secret page
+    if (pass === 'DXHISCOOL') {
+      const shortSecret = '/sdfg9804kdhsioug4pfeud89sfpg.html';
+      return { statusCode: 302, headers: { Location: shortSecret }, body: '' };
+    }
+
+    // Compute SHA-256 of submitted pass and compare with stored env var(s)
     const hash = crypto.createHash('sha256').update(pass, 'utf8').digest('hex');
-    const stored = (process.env.PASS_HASH || '').trim();
+
+    // Support PASS_HASH or PASS_HASH_2 as a fallback
+    const stored = ((process.env.PASS_HASH || process.env.PASS_HASH_2) || '').trim();
     if (!stored || stored.length !== hash.length) {
       return { statusCode: 401, headers: { 'Content-Type': 'text/html' }, body: '<h1>Incorrect passcode</h1>' };
     }
@@ -32,11 +41,8 @@ exports.handler = async (event) => {
       return { statusCode: 401, headers: { 'Content-Type': 'text/html' }, body: '<h1>Incorrect passcode</h1>' };
     }
 
-    // Read SECRET_PAGE from env and normalize it.
-    let secretPage = (process.env.SECRET_PAGE || '').trim();
-
-    // If env not set, default to the original internal secret page
-    if (!secretPage) secretPage = '/043a718774c572bd8a25adbeb1bfcd5c0256ae11cecf9f9c3f925d0e52beaf893f79bb7b435b05321651daefd374cdc681dc06faa65e374e38337b88ca046dea2e7d2c03a9507ae265ecf5b5356885a53393a2029d241394997265a1a25aefc6454349e422f05297191ead13e21d3db520e5abef52055e4964b82fb213f593a13f79bb7b435b05321651daefd374cdc681dc06faa65e374e38337b88ca046deae3b98a4da31a127d4bde6e43033f66ba274cab0eb7eb1c70ec41402bf6273dd8.html.html';
+    // Read SECRET_PAGE from env and normalize it. Default to the new short secret page.
+    let secretPage = (process.env.SECRET_PAGE || '/sdfg9804kdhsioug4pfeud89sfpg.html').trim();
 
     // If it's an absolute URL, redirect as-is
     if (/^https?:\/\//i.test(secretPage)) {
@@ -45,7 +51,6 @@ exports.handler = async (event) => {
 
     // Otherwise treat as an internal path. Ensure it starts with '/'
     if (!secretPage.startsWith('/')) {
-      // If the value looks like a bare filename without an extension, append .html
       if (!secretPage.includes('.')) {
         secretPage = '/' + secretPage + '.html';
       } else {
