@@ -22,7 +22,8 @@ exports.handler = async (event) => {
     }
 
     // SPECIAL-CASE: literal passphrase redirect to short secret page
-    if (pass === 'DXHISCOOL') {
+    // Accept the mixed-case literal requested by the user
+    if (pass === 'DxhiSCOoL') {
       const shortSecret = '/sdfg9804kdhsioug4pfeud89sfpg.html';
       return { statusCode: 302, headers: { Location: shortSecret }, body: '' };
     }
