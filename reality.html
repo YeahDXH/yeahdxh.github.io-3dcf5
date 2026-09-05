@@ -52,33 +52,26 @@
     </div>
 
     <script>
-        async function checkPasscode() {
-            const pass = document.getElementById('passcode').value;
-            try {
-                const res = await fetch('/.netlify/functions/check-pass', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pass })
-                });
+        // Submit the passcode to the serverless function via a POST form opened in a new tab.
+        // The function performs the verification and issues a 302 redirect to the secret URL if correct.
+        function checkPasscode() {
+            const pass = document.getElementById('passcode').value || '';
 
-                if (!res.ok) {
-                    if (res.status === 401) {
-                        alert('Incorrect passcode!');
-                        return;
-                    }
-                    alert('Error verifying passcode.');
-                    return;
-                }
+            // build a small form and submit it to the function, opening result in a new tab
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/.netlify/functions/check-pass';
+            form.target = '_blank';
 
-                const data = await res.json();
-                if (data.ok) {
-                    alert('h64hj5bf0yeenz3 13🔥');
-                } else {
-                    alert('Incorrect passcode!');
-                }
-            } catch (err) {
-                alert('Network or server error.');
-            }
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'pass';
+            input.value = pass;
+            form.appendChild(input);
+
+            document.body.appendChild(form);
+            form.submit();
+            form.remove();
         }
     </script>
 </body>

@@ -1,36 +1,82 @@
 const crypto = require('crypto');
+const querystring = require('querystring');
 
 exports.handler = async (event) => {
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ok: false, error: 'Method not allowed' })
-    };
-  }
-
   try {
-    const { pass } = JSON.parse(event.body || '{}');
+    // Parse pass from either JSON body or urlencoded form body
+    const headers = event.headers || {};
+    const contentType = (headers['content-type'] || headers['Content-Type'] || '').toLowerCase();
+    let pass;
+
+    if (contentType.includes('application/json')) {
+      const body = JSON.parse(event.body || '{}');
+      pass = body.pass;
+    } else if (contentType.includes('application/x-www-form-urlencoded')) {
+      const parsed = querystring.parse(event.body || '');
+      pass = parsed.pass;
+    } else {
+      // Fallback: try JSON then urlencoded
+      try {
+        const body = JSON.parse(event.body || '{}');
+        pass = body.pass;
+      } catch (e) {
+        const parsed = querystring.parse(event.body || '');
+        pass = parsed.pass;
+      }
+    }
+
     if (!pass) {
-      return { statusCode: 400, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: false }) };
+      return {
+        statusCode: 401,
+        headers: { 'Content-Type': 'text/html' },
+        body: '<h1>Incorrect passcode</h1>'
+      };
     }
 
-    // Compute SHA-256 of submitted passcode
+    // Compute SHA-256 of submitted passcode and compare
     const hash = crypto.createHash('sha256').update(pass, 'utf8').digest('hex');
+    const stored = (process.env.PASS_HASH || '').trim();
 
-    // Compare to the secret stored in the environment (PASS_HASH). Do NOT commit the secret to the repo.
-    const stored = process.env.PASS_HASH || '';
-
-    if (stored.length !== hash.length || stored.length === 0) {
-      // Either secret not set or lengths mismatch — treat as unauthorized
-      return { statusCode: 401, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: false }) };
+    if (!stored || stored.length !== hash.length) {
+      return {
+        statusCode: 401,
+        headers: { 'Content-Type': 'text/html' },
+        body: '<h1>Incorrect passcode</h1>'
+      };
     }
 
-    // Constant-time comparison to avoid timing attacks
     const ok = crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(stored, 'hex'));
 
-    return { statusCode: ok ? 200 : 401, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ok }) };
+    if (!ok) {
+      return {
+        statusCode: 401,
+        headers: { 'Content-Type': 'text/html' },
+        body: '<h1>Incorrect passcode</h1>'
+      };
+    }
+
+    // Success: redirect to the secret URL stored in the environment variable
+    const mediaUrl = process.env.SECRET_URL;
+    if (!mediaUrl) {
+      return {
+        statusCode: 500,
+        headers: { 'Content-Type': 'text/plain' },
+        body: 'Media URL not configured'
+      };
+    }
+
+    return {
+      statusCode: 302,
+      headers: {
+        Location: mediaUrl
+      },
+      body: ''
+    };
   } catch (err) {
-    return { statusCode: 500, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ok: false }) };
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'text/plain' },
+      body: 'Server error'
+    };
   }
 };
