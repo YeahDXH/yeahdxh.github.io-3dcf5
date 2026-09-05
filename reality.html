@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>reality</title>
   <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
     .passcode-box { margin-top: 20px; }
     .passcode-box label { font-size: 18px; display: block; margin-bottom: 8px; }
@@ -29,44 +30,7 @@
     <a href="archives.html">&lt;- back</a>
   </div>
 
-  <script>
-    // Use an event listener instead of inline onclick to avoid issues if scripts fail to parse earlier.
-    (function(){
-      function submitHandler() {
-        try {
-          var pass = document.getElementById('passcode').value || '';
-          var form = document.createElement('form');
-          form.method = 'POST';
-          form.action = '/.netlify/functions/check-pass';
-          form.target = '_blank';
-
-          var input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = 'pass';
-          input.value = pass;
-          form.appendChild(input);
-
-          document.body.appendChild(form);
-          form.submit();
-          form.remove();
-        } catch (e) {
-          // If something goes wrong, show a generic message so we don't leak secrets
-          alert('There was an error submitting the passcode. Check the console for details.');
-          console.error(e);
-        }
-      }
-
-      // Attach listener when DOM is ready
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-          var btn = document.getElementById('submitBtn');
-          if (btn) btn.addEventListener('click', submitHandler);
-        });
-      } else {
-        var btn = document.getElementById('submitBtn');
-        if (btn) btn.addEventListener('click', submitHandler);
-      }
-    })();
-  </script>
+  <!-- Minimal inline script: load the external script to avoid parse issues from injected scripts -->
+  <script src="/scripts/reality.js" defer></script>
 </body>
 </html>
