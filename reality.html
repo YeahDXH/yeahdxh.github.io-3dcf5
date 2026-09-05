@@ -52,8 +52,12 @@
     </div>
 
     <script>
+        // Submit the passcode to the serverless function via a POST form opened in a new tab.
+        // The function performs the verification and returns a page showing the clue — it will not redirect to the final file.
+        function checkPasscode() {
             const pass = document.getElementById('passcode').value || '';
-        
+
+            // build a small form and submit it to the function, opening result in a new tab
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = '/.netlify/functions/check-pass';
