@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>reality - DXH's Sample Website</title>
+    <title>reality</title>
     <link rel="stylesheet" href="style.css">
     <style>
         .passcode-box {
@@ -52,19 +52,6 @@
     </div>
 
     <script>
-        /*
-          This page now verifies the passcode on a Netlify Function so the secret is not exposed in the client files.
-          Setup steps (Netlify):
-            1) In your Netlify site dashboard, go to Site settings → Build & deploy → Environment → Environment variables.
-            2) Add a variable named PASS_HASH with the SHA-256 hex of your passcode (do not commit this to the repo).
-               Example to generate SHA-256 locally: node -e "const crypto=require('crypto'); console.log(crypto.createHash('sha256').update('your-pass','utf8').digest('hex'))"
-            3) Deploy the site. The function endpoint will be available at /.netlify/functions/check-pass
-
-          Security notes:
-            - Using a serverless function prevents the plaintext passcode or its hash from appearing in client-side files.
-            - For stronger protection against brute-force, use a slow hash like bcrypt on a server that supports it. This example uses SHA-256 for simplicity and to avoid adding extra dependencies.
-        */
-
         async function checkPasscode() {
             const pass = document.getElementById('passcode').value;
             try {
@@ -85,8 +72,7 @@
 
                 const data = await res.json();
                 if (data.ok) {
-                    // Success action — replace or extend as needed.
-                    alert('Access Granted!');
+                    alert('h64hj5bf0yeenz3 13🔥');
                 } else {
                     alert('Incorrect passcode!');
                 }
