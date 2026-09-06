@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NOTES (4.9.2026) - DXH's Sample Website</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header-star">
+        <span class="line-1">DXH's</span>
+        <span class="line-2">Sample Website</span>
+    </div>
+
+    <h1 class="page-title">NOTES (4.9.2026)</h1>
+
+    <p style="font-size: 20px;">
+        ok, so the school is starting tomorrow and since my school is in vietnam and it kinda gobbles up a lot of my time for me to start on my projects, but i'll try to focus whatever i can, studies, games, idk
+    </p>
+
+    <div class="footnote">
+        6.9 means september 6th, 9.6 means september 6th for freedom units
+    </div>
+
+    <div class="back-link">
+        <a href="notes.html">&lt;- NOTES</a>
+    </div>
+</body>
+</html>
