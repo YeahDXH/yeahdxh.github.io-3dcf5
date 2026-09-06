@@ -51,15 +51,26 @@ export default async function handler(req, res) {
 
     // Case-insensitive literal for the main puzzle phrase
     if (passNorm === 'start the puzzle') {
-      const secret = normalizeSecretPage(process.env.SECRET_PAGE, '/puzzle/intro.html');
-      res.writeHead(302, { Location: secret });
+      const secretPath = normalizeSecretPage(process.env.SECRET_PAGE, '/puzzle/intro.html');
+      // Build absolute URL and encode path to avoid long-filename/encoding issues
+      let location = secretPath;
+      if (!/^https?:\/\//i.test(secretPath)) {
+        const host = req.headers['x-forwarded-host'] || req.headers.host || '';
+        const proto = req.headers['x-forwarded-proto'] || 'https';
+        location = proto + '://' + host + encodeURI(secretPath);
+      }
+      res.writeHead(302, { Location: location });
       res.end();
       return;
     }
 
     // Backwards compatibility literal
     if (pass === 'DxhiSCOoL') {
-      res.writeHead(302, { Location: '/sdfg9804kdhsioug4pfeud89sfpg.html' });
+      const secretPath = '/sdfg9804kdhsioug4pfeud89sfpg.html';
+      const host = req.headers['x-forwarded-host'] || req.headers.host || '';
+      const proto = req.headers['x-forwarded-proto'] || 'https';
+      const location = proto + '://' + host + encodeURI(secretPath);
+      res.writeHead(302, { Location: location });
       res.end();
       return;
     }
@@ -70,8 +81,14 @@ export default async function handler(req, res) {
     // Plaintext env fallback
     if (storedEnv && !/^[0-9a-f]{64}$/i.test(storedEnv)) {
       if (passNorm === storedEnv.toLowerCase().trim()) {
-        const secret = normalizeSecretPage(process.env.SECRET_PAGE, '/sdfg9804kdhsioug4pfeud89sfpg.html');
-        res.writeHead(302, { Location: secret });
+        const secretPath = normalizeSecretPage(process.env.SECRET_PAGE, '/sdfg9804kdhsioug4pfeud89sfpg.html');
+        let location = secretPath;
+        if (!/^https?:\/\//i.test(secretPath)) {
+          const host = req.headers['x-forwarded-host'] || req.headers.host || '';
+          const proto = req.headers['x-forwarded-proto'] || 'https';
+          location = proto + '://' + host + encodeURI(secretPath);
+        }
+        res.writeHead(302, { Location: location });
         res.end();
         return;
       }
@@ -97,8 +114,14 @@ export default async function handler(req, res) {
       return;
     }
 
-    const secret = normalizeSecretPage(process.env.SECRET_PAGE, '/sdfg9804kdhsioug4pfeud89sfpg.html');
-    res.writeHead(302, { Location: secret });
+    const secretPath = normalizeSecretPage(process.env.SECRET_PAGE, '/sdfg9804kdhsioug4pfeud89sfpg.html');
+    let location = secretPath;
+    if (!/^https?:\/\//i.test(secretPath)) {
+      const host = req.headers['x-forwarded-host'] || req.headers.host || '';
+      const proto = req.headers['x-forwarded-proto'] || 'https';
+      location = proto + '://' + host + encodeURI(secretPath);
+    }
+    res.writeHead(302, { Location: location });
     res.end();
 
   } catch (err) {
