@@ -28,7 +28,8 @@
   <h1 class="page-title">reality</h1>
 
   <div class="passcode-box">
-    <form method="post" action="/.netlify/functions/check-pass">
+    <!-- Changed from Netlify function endpoint to Vercel API route -->
+    <form method="post" action="/api/check-pass">
       <label for="passcode">whats the passcode?</label><br>
       <input type="password" id="passcode" name="pass" autocomplete="off" aria-label="passcode">
       <div>
