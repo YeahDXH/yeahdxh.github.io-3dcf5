@@ -2,14 +2,25 @@ import crypto from 'crypto';
 import querystring from 'querystring';
 
 function normalizeSecretPage(value, fallback) {
+  // Normalize a SECRET_PAGE-like value into a safe absolute path or absolute URL.
+  // Behavior:
+  // - If value is an absolute URL (http(s)://) -> return as-is.
+  // - If value starts with a slash -> treat as absolute path and return it (ensure trimmed).
+  // - If value contains a dot (e.g. "file.html") but no leading slash -> add leading slash.
+  // - If value is a short name without dot or slash (e.g. "thegreatdxhpuzzlesanctuary") ->
+  //   assume it's inside the /puzzle/ folder and return "/puzzle/<value>.html".
   let secretPage = (value || fallback || '').trim();
   if (!secretPage) secretPage = fallback || '/';
-  if (/^https?:\/\//i.test(secretPage)) return secretPage;
-  if (!secretPage.startsWith('/')) {
-    if (!secretPage.includes('.')) secretPage = '/' + secretPage + '.html';
-    else secretPage = '/' + secretPage;
+  if (/^https?:\/\//i.test(secretPage)) return secretPage; // absolute URL unchanged
+  if (secretPage.startsWith('/')) return secretPage; // already absolute path
+
+  // If it contains a dot assume it's a filename like "somepage.html" -> add leading slash
+  if (secretPage.includes('.')) {
+    return '/' + secretPage;
   }
-  return secretPage;
+
+  // Otherwise treat as short name and place under /puzzle/ with .html
+  return '/puzzle/' + secretPage + '.html';
 }
 
 export default async function handler(req, res) {
@@ -24,7 +35,6 @@ export default async function handler(req, res) {
     if (ct.includes('application/json')) {
       pass = req.body && req.body.pass;
     } else if (ct.includes('application/x-www-form-urlencoded')) {
-      // If Vercel/Next already parsed the body, req.body may be an object; otherwise try parsing raw
       if (typeof req.body === 'object' && req.body !== null) pass = req.body.pass;
       else {
         const raw = typeof req.body === 'string' ? req.body : '';
@@ -32,7 +42,6 @@ export default async function handler(req, res) {
         pass = parsed.pass;
       }
     } else {
-      // Try best-effort: check req.body or parse as urlencoded fallback
       if (typeof req.body === 'object' && req.body !== null) pass = req.body.pass;
       else {
         const raw = typeof req.body === 'string' ? req.body : '';
@@ -51,8 +60,7 @@ export default async function handler(req, res) {
 
     // Case-insensitive literal for the main puzzle phrase
     if (passNorm === 'start the puzzle') {
-      const secretPath = normalizeSecretPage(process.env.SECRET_PAGE, '/puzzle/intro.html');
-      // Build absolute URL and encode path to avoid long-filename/encoding issues
+      const secretPath = normalizeSecretPage(process.env.SECRET_PAGE, '/puzzle/thegreatdxhpuzzlesanctuary.html');
       let location = secretPath;
       if (!/^https?:\/\//i.test(secretPath)) {
         const host = req.headers['x-forwarded-host'] || req.headers.host || '';
@@ -81,7 +89,7 @@ export default async function handler(req, res) {
     // Plaintext env fallback
     if (storedEnv && !/^[0-9a-f]{64}$/i.test(storedEnv)) {
       if (passNorm === storedEnv.toLowerCase().trim()) {
-        const secretPath = normalizeSecretPage(process.env.SECRET_PAGE, '/sdfg9804kdhsioug4pfeud89sfpg.html');
+        const secretPath = normalizeSecretPage(process.env.SECRET_PAGE, '/puzzle/thegreatdxhpuzzlesanctuary.html');
         let location = secretPath;
         if (!/^https?:\/\//i.test(secretPath)) {
           const host = req.headers['x-forwarded-host'] || req.headers.host || '';
@@ -114,7 +122,7 @@ export default async function handler(req, res) {
       return;
     }
 
-    const secretPath = normalizeSecretPage(process.env.SECRET_PAGE, '/sdfg9804kdhsioug4pfeud89sfpg.html');
+    const secretPath = normalizeSecretPage(process.env.SECRET_PAGE, '/puzzle/thegreatdxhpuzzlesanctuary.html');
     let location = secretPath;
     if (!/^https?:\/\//i.test(secretPath)) {
       const host = req.headers['x-forwarded-host'] || req.headers.host || '';
