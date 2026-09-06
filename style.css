@@ -7,16 +7,18 @@ body {
     box-sizing: border-box;
     position: relative;
     min-height: 100vh;
+    font-size: 16px; /* increase base font size so forms and paragraphs are readable */
+    line-height: 1.45;
 }
 
 /* Star Banner */
 .header-star {
     position: absolute;
-    top: 20px;
-    right: 30px;
-    width: 260px;
-    height: 130px;
-    background-color: #155e7d;
+    top: 18px;
+    right: 36px;
+    width: 240px;
+    height: 120px;
+    background-color: #0b6b79; /* teal */
     clip-path: polygon(50% 0%, 63% 25%, 100% 12%, 80% 48%, 100% 82%, 62% 75%, 50% 100%, 37% 75%, 0% 82%, 20% 48%, 0% 12%, 37% 25%);
     display: flex;
     flex-direction: column;
@@ -25,36 +27,56 @@ body {
     color: #ffffff;
     font-family: "Times New Roman", Times, serif;
     text-align: center;
-    line-height: 1.1;
-    z-index: 10;
+    line-height: 1.05;
+    z-index: 50;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    padding: 6px 8px;
 }
 
 .header-star .line-1 {
     font-size: 20px;
     text-decoration: underline;
+    margin-bottom: 2px;
 }
 
 .header-star .line-2 {
-    font-size: 24px;
+    font-size: 14px;
+}
+
+/* make the star scale down on small screens */
+@media (max-width: 600px) {
+  .header-star { display: none; }
 }
 
 /* Page Headings & Links */
 h1.page-title {
-    font-size: 32px;
+    font-size: 40px;
     font-weight: bold;
     margin: 0 0 25px 0;
     text-transform: uppercase;
 }
 
+/* reality page title fallback */
+.page-title { color: #000; }
+
+/* Form & Input sizing */
+label, input[type="password"], .btn {
+    font-size: 16px;
+}
+
+input[type="password"] {
+    padding: 10px;
+    font-size: 16px;
+}
+
+/* Links */
 a {
     color: #00a2ff;
     text-decoration: underline;
     font-weight: bold;
 }
 
-a:hover {
-    color: #0066cc;
-}
+a:hover { color: #0066cc; }
 
 /* Bottom Right Back Link */
 .back-link {
